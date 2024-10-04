@@ -23,6 +23,9 @@ public class ProbeResource {
     @Inject
     Template probesPage;
 
+    @Inject
+    Template statusPage;
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance index() {
@@ -50,5 +53,19 @@ public class ProbeResource {
     public TemplateInstance registerProbe(@FormParam("url") String url) {
         var probe = probeService.getOrCreateProbe(url);
         return probesPage.instance().data("probeList", probeService.listProbes());
+    }
+
+    @GET
+    @Path("/probes/{id}")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance status(@PathParam("id") Integer id) {
+        var probe = probeService.findProbeById(id);
+        var statusList = probeService.getProbeStatusList(probe);
+
+        return statusPage.instance()
+                .data("probe", probe)
+                .data("status", statusList.getFirst())
+                .data("statusList", statusList);
+
     }
 }
